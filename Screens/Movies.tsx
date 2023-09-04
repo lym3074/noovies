@@ -26,6 +26,10 @@ const ListTitle = styled.Text`
     margin-left: 30px;
 `;
 
+const ListContainer = styled.View`
+    margin-bottom: 30px;
+`;
+
 const TrendingScroll = styled.ScrollView`
     margin-top: 20px;
 `;
@@ -35,16 +39,45 @@ const Movie = styled.View`
     align-items: center;
 `;
 
+const HMovie = styled.View`
+    padding: 0px 30px;
+    flex-direction: row;
+    margin-bottom: 30px;
+`;
+
+const HColumn = styled.View`
+    margin-left: 15px;
+    width: 80%;
+`;
+
+const Overview = styled.Text`
+    color: white;
+    width: 80%;
+`;
+
+const Release = styled.Text`
+    color: white;
+    font-size: 12px;
+    margin-vertical: 10px;
+`;
+
+const ComingsoonTitle = styled(ListTitle)`
+    margin-bottom: 30px;
+`;
+
 const Title = styled.Text`
     color: white;
     font-weight: 600;
     margin-top: 7px;
     margin-bottom: 5px;
 `;
+
 const Votes = styled.Text`
     color: rgba(255,255,255,0.7);
     font-size: 12px;
 `;
+
+
 const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
     
     const [loading, setLoading] = useState(true);
@@ -119,24 +152,59 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
             ))}
             
         </Swiper>
-        <ListTitle>Trending Movies</ListTitle>
-        {/** 스크롤 뷰 자체에 스타일을 주면 끝까지 안간다. */}
-        <TrendingScroll
-            horizontal
-            showsHorizontalScrollIndicator={false}
-            contentContainerStyle={{paddingLeft: 30}}
-        > 
-            {trending.map(movie => (
-            <Movie key={movie.id}>
-                <Poster path={movie.poster_path} />
-                <Title>{movie.original_title.slice(0, 13)}
-                {movie.original_title.length > 13 && "..."}
-                </Title>
-                <Votes>⭐️{movie.vote_average}/10</Votes>
-            </Movie>))}
-        </TrendingScroll>
+        <ListContainer>
+            <ListTitle>Trending Movies</ListTitle>
+            {/** 스크롤 뷰 자체에 스타일을 주면 끝까지 안간다. */}
+            <TrendingScroll
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={{paddingLeft: 30}}
+            > 
+                {trending.map(movie => (
+                <Movie key={movie.id}>
+                    <Poster path={movie.poster_path} />
+                    <Title>{movie.original_title.slice(0, 13)}
+                    {movie.original_title.length > 13 && "..."}
+                    </Title>
+                    <Votes>{movie.vote_average>0?`⭐️${movie.vote_average}/10`:`Coming soon`}</Votes>
+                </Movie>))}
+            </TrendingScroll>
+        </ListContainer>
+        
+        <ComingsoonTitle>Comming Soon Movies</ComingsoonTitle>
+        {upcoming.map(movie => <HMovie key={movie.id}>
+            <Poster path={movie.poster_path}/>
+            <HColumn>
+                <Title>{movie.original_title}</Title>
+                <Release>{
+                    new Date(movie.release_date).toLocaleDateString("ko", {month: "long", day: "numeric", year: "numeric"})
+                }</Release>
+                <Overview>{
+                    movie.overview !=="" &&
+                    movie.overview.length > 140? 
+                    `${movie.overview.slice(0, 140)}...`: movie.overview
+                }
+                </Overview>
+                
+            </HColumn>
+        </HMovie>)}
     </Container>
     );
 }
+
+// date :
+// new Date("2021-10-06").toLocaleDateString("ko")
+// -> 2023. 7. 19
+
+// new Date("2021-10-06").toLocaleDateString("ko", {month: "long"})
+// -> '10월'
+
+// new Date("2021-10-06").toLocaleDateString("ko", {month: "long", day: "numeric"})
+// -> '10월 6일'
+
+// new Date("2021-10-06").toLocaleDateString("ko", {month: "long", day: "numeric", year: "numeric"})
+// -> '2021년 10월 6일'
+
+
 
 export default Movies;
