@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components/native"
-import { ActivityIndicator, ScrollView, StyleSheet, useColorScheme } from "react-native";
+import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, useColorScheme } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Dimensions } from "react-native";
 import { makeImgPath } from "../utils";
@@ -79,7 +79,7 @@ const Votes = styled.Text`
 
 
 const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
-    
+    const [refreshing, setRefreshing] =useState(false);
     const [loading, setLoading] = useState(true);
     const [nowPlaying, setNowPlaying] = useState([]);
     const [trending, setTrending] = useState([]);
@@ -91,7 +91,7 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
                 `https://api.themoviedb.org/3/movie/popular?language=en-US&page=1&api_key=${API_KEY}`
             )
         ).json();
-        console.log(results)
+
         setTrending(results);
     }
 
@@ -124,13 +124,22 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
     useEffect(() => {
         getData();
     }, []);
+
+    const onRefresh = async() => {
+        setRefreshing(true);
+        await getData();
+        setRefreshing(false);
+        console.log("refresh")
+    }
     
     return (loading ? 
     <Loader >
         <ActivityIndicator />
     </Loader> 
     :
-    <Container>
+    <Container
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}
+    >
         <Swiper
             horizontal
             showsButtons={false}
