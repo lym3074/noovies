@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components/native"
-import { ActivityIndicator, StyleSheet, useColorScheme } from "react-native";
+import { ActivityIndicator, ScrollView, StyleSheet, useColorScheme } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Dimensions } from "react-native";
 import { makeImgPath } from "../utils";
 import { BlurView } from "expo-blur";
 import Swiper from "react-native-swiper";
 import Slide from "../components/slide";
+import Poster from "../components/poster";
 
 const Container = styled.ScrollView``;
 const Loader = styled.View`
@@ -17,6 +18,33 @@ const Loader = styled.View`
 
 const API_KEY = 'ef0d1a8e7f2e44edcc57e73fdd30ad39';
 const {height: SCREEN_HEIGHT} = Dimensions.get("screen");
+
+const ListTitle = styled.Text`
+    color: white;
+    font-size: 18px;
+    font-weight: 600;
+    margin-left: 30px;
+`;
+
+const TrendingScroll = styled.ScrollView`
+    margin-top: 20px;
+`;
+
+const Movie = styled.View`
+    margin-right: 15px;
+    align-items: center;
+`;
+
+const Title = styled.Text`
+    color: white;
+    font-weight: 600;
+    margin-top: 7px;
+    margin-bottom: 5px;
+`;
+const Votes = styled.Text`
+    color: rgba(255,255,255,0.7);
+    font-size: 12px;
+`;
 const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
     
     const [loading, setLoading] = useState(true);
@@ -27,10 +55,10 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
     const getTrending = async () => {
         const {results} = await (
             await fetch(
-                `https://api.themoviedb.org/3/movie/trending?api_key=${API_KEY}`
+                `https://api.themoviedb.org/3/movie/popular?language=en-US&page=1&api_key=${API_KEY}`
             )
         ).json();
-
+        console.log(results)
         setTrending(results);
     }
 
@@ -55,13 +83,13 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
         setLoading(false);
     };
 
-    const getDat = async () => {
+    const getData = async () => {
         await Promise.all([getNowPlaying(), getTrending(), getUpcoming()])
         setLoading(false);
     }
 
     useEffect(() => {
-        getNowPlaying();
+        getData();
     }, []);
     
     return (loading ? 
@@ -77,7 +105,7 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
             autoplayTimeout={3.5}
             showsPagination={false}
             loop
-            containerStyle={{width: "100%", height: SCREEN_HEIGHT/4}}
+            containerStyle={{width: "100%", height: SCREEN_HEIGHT/4, marginBottom: 30}}
         >
             {nowPlaying.map(movie => (
                 <Slide
@@ -91,6 +119,22 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
             ))}
             
         </Swiper>
+        <ListTitle>Trending Movies</ListTitle>
+        {/** 스크롤 뷰 자체에 스타일을 주면 끝까지 안간다. */}
+        <TrendingScroll
+            horizontal
+            showsHorizontalScrollIndicator={false}
+            contentContainerStyle={{paddingLeft: 30}}
+        > 
+            {trending.map(movie => (
+            <Movie key={movie.id}>
+                <Poster path={movie.poster_path} />
+                <Title>{movie.original_title.slice(0, 13)}
+                {movie.original_title.length > 13 && "..."}
+                </Title>
+                <Votes>⭐️{movie.vote_average}/10</Votes>
+            </Movie>))}
+        </TrendingScroll>
     </Container>
     );
 }
