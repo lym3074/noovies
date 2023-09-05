@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import styled from "styled-components/native"
-import { ActivityIndicator, RefreshControl, ScrollView, StyleSheet, useColorScheme } from "react-native";
+import { ActivityIndicator, FlatList, RefreshControl, ScrollView, StyleSheet, View, useColorScheme } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Dimensions } from "react-native";
 import { makeImgPath } from "../utils";
@@ -8,6 +8,8 @@ import { BlurView } from "expo-blur";
 import Swiper from "react-native-swiper";
 import Slide from "../components/Slide";
 import Poster from "../components/Poster";
+import VMedia from "../components/VMedia";
+import HMedia from "../components/HMedia";
 
 const Container = styled.ScrollView``;
 const Loader = styled.View`
@@ -30,7 +32,7 @@ const ListContainer = styled.View`
     margin-bottom: 30px;
 `;
 
-const TrendingScroll = styled.ScrollView`
+const TrendingScroll = styled.FlatList`
     margin-top: 20px;
 `;
 
@@ -163,40 +165,34 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
         </Swiper>
         <ListContainer>
             <ListTitle>Trending Movies</ListTitle>
-            {/** 스크롤 뷰 자체에 스타일을 주면 끝까지 안간다. */}
-            <TrendingScroll
+            <TrendingScroll 
+                data={trending}
                 horizontal
+                keyExtractor={(item) => item.id + ""}
                 showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{paddingLeft: 30}}
-            > 
-                {trending.map(movie => (
-                <Movie key={movie.id}>
-                    <Poster path={movie.poster_path} />
-                    <Title>{movie.original_title.slice(0, 13)}
-                    {movie.original_title.length > 13 && "..."}
-                    </Title>
-                    <Votes>{movie.vote_average>0?`⭐️${movie.vote_average}/10`:`Coming soon`}</Votes>
-                </Movie>))}
-            </TrendingScroll>
+                contentContainerStyle={{paddingHorizontal: 20}}
+                ItemSeparatorComponent={() => <View style={{width:20}}></View>}
+                renderItem={({item}) => <VMedia 
+                    // key={movie.id}
+                    posterPath={item.poster_path} // Key Extracter : 각 리스트 아이템에 어떤 key를 가져야 할 지 알려준다.
+                    originalTitle={item.original_title}
+                    voteAverage={item.vote_average}
+                />}
+                
+            />
         </ListContainer>
         
         <ComingsoonTitle>Comming Soon</ComingsoonTitle>
-        {upcoming.map(movie => <HMovie key={movie.id}>
-            <Poster path={movie.poster_path}/>
-            <HColumn>
-                <Title>{movie.original_title}</Title>
-                <Release>{
-                    new Date(movie.release_date).toLocaleDateString("ko", {month: "long", day: "numeric", year: "numeric"})
-                }</Release>
-                <Overview>{
-                    movie.overview !=="" &&
-                    movie.overview.length > 140? 
-                    `${movie.overview.slice(0, 140)}...`: movie.overview
-                }
-                </Overview>
-                
-            </HColumn>
-        </HMovie>)}
+        {upcoming.map(movie => (
+            <HMedia 
+                key={movie.id}
+                posterPath={movie.poster_path}
+                originalTitle={movie.original_title}
+                voteAverage={movie.vote_average}
+                overview={movie.overview}
+                releaseDate={movie.release_date}
+            />
+        ))}
     </Container>
     );
 }
