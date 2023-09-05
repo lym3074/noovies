@@ -6,8 +6,8 @@ import { Dimensions } from "react-native";
 import { makeImgPath } from "../utils";
 import { BlurView } from "expo-blur";
 import Swiper from "react-native-swiper";
-import Slide from "../components/slide";
-import Poster from "../components/poster";
+import Slide from "../components/Slide";
+import Poster from "../components/Poster";
 
 const Container = styled.ScrollView``;
 const Loader = styled.View`
@@ -180,7 +180,7 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
             </TrendingScroll>
         </ListContainer>
         
-        <ComingsoonTitle>Comming Soon Movies</ComingsoonTitle>
+        <ComingsoonTitle>Comming Soon</ComingsoonTitle>
         {upcoming.map(movie => <HMovie key={movie.id}>
             <Poster path={movie.poster_path}/>
             <HColumn>

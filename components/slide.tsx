@@ -3,7 +3,7 @@ import React from "react";
 import { View, StyleSheet, useColorScheme } from "react-native";
 import styled from "styled-components/native/";
 import { makeImgPath } from "../utils";
-import Poster from "./poster";
+import Poster from "./Poster";
 
 
 const Title = styled.Text`
