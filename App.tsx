@@ -1,21 +1,24 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { View, Text, Image, useColorScheme } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { useColorScheme } from 'react-native';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import {Ionicons} from "@expo/vector-icons";
-import { Asset, useAssets } from 'expo-asset';
 import { NavigationContainer } from '@react-navigation/native';
-import Tabs from './navigation/Tabs';
 import Root from './navigation/Root';
 import { darkTheme, lightTheme } from './styled';
 import { ThemeProvider } from 'styled-components';
+import { QueryClient, QueryClientProvider} from "react-query";
 
 SplashScreen.preventAutoHideAsync();
 
+const queryClient = new QueryClient();
+
 export default function App() {
+  
   const [appIsReady, setAppIsReady] = useState(false);
   // const [assetLoaded] = useAssets([require('./godiva.jpeg')]);
   const [fontsLoaded] = useFonts(Ionicons.font);
+  
 
   useEffect(() => {
     async function prepare() {
@@ -37,11 +40,14 @@ export default function App() {
     return null;
   }
   return (
-    <ThemeProvider theme={isDark? darkTheme : lightTheme}>
-      <NavigationContainer>
-        <Root />
-      </NavigationContainer>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <ThemeProvider theme={isDark? darkTheme : lightTheme}>
+        <NavigationContainer>
+          <Root />
+        </NavigationContainer>
+      </ThemeProvider>
+    </QueryClientProvider>
+    
     
   )
 }
