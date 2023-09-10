@@ -21,6 +21,7 @@ const Tabs = () => {
         }}
         
         screenOptions={{
+            unmountOnBlur: true, // component를 떠나면 unmount
             tabBarStyle: { backgroundColor: isDark? colors.blackPerl : colors.white },
             tabBarActiveTintColor: isDark? "#ffa801" : colors.blackPerl,
             tabBarInactiveTintColor: isDark? colors.simpleGray : colors.darkGray,

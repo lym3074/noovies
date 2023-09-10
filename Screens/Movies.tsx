@@ -7,6 +7,8 @@ import Swiper from "react-native-swiper";
 import Slide from "../components/Slide";
 import VMedia from "../components/VMedia";
 import HMedia from "../components/HMedia";
+import { useQuery } from "react-query";
+import { moviesAPI } from "../api";
 
 const Loader = styled.View`
     flex: 1;
@@ -65,14 +67,21 @@ const renderHMedia = ({item}) => (
 
 const movieKeyExtractor = (item) => item.id + "";
 
+
 const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
     const [refreshing, setRefreshing] =useState(false);
 
+    const {isLoading: nowPlayingLoading, data: nowPlayingData} = useQuery(
+        "nowPlaying",
+        // caching을 위한 키, 동일 pathing을 막아준다. rn query 캐시로 넘어가서 다른 컴포넌트에 가더라도 동일한 key의 쿼리를 사용할 수 있다.
+         moviesAPI.nowPlaying
+    )
+    const {isLoading: trendingLoading, data: trendingData} = useQuery("trending", moviesAPI.trending)
+    const {isLoading: upcomingLoading, data: upcomingData} = useQuery("upcoming", moviesAPI.upcoming)
+    
+    const loading = nowPlayingLoading || trendingLoading || upcomingLoading;
+
     const onRefresh = async() => {
-        // setRefreshing(true);
-        // await getData();
-        // setRefreshing(false);
-        // console.log("refresh")
     }
 
     return (loading ? 
@@ -83,7 +92,7 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
     <FlatList
         refreshing={refreshing}
         onRefresh={onRefresh}
-        data={upcoming}
+        data={upcomingData.results}
         keyExtractor={movieKeyExtractor}
         ItemSeparatorComponent={VSeparator}
         ListHeaderComponent={() => (
@@ -97,7 +106,7 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
                 loop
                 containerStyle={{width: "100%", height: SCREEN_HEIGHT/4, marginBottom: 30}}
             >
-                {nowPlaying.map(movie => (
+                {nowPlayingData.results.map(movie => (
                     <Slide
                         backdropPath={movie.backdrop_path}
                         voteAverage={movie.vote_average}
@@ -112,7 +121,7 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
             <ListContainer>
                 <ListTitle>Trending Movies</ListTitle>
                 <TrendingScroll 
-                    data={trending}
+                    data={trendingData.results}
                     horizontal
                     keyExtractor={movieKeyExtractor}
                     showsHorizontalScrollIndicator={false}
@@ -130,20 +139,5 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
     />  
     );
 }
-
-// date :
-// new Date("2021-10-06").toLocaleDateString("ko")
-// -> 2023. 7. 19
-
-// new Date("2021-10-06").toLocaleDateString("ko", {month: "long"})
-// -> '10월'
-
-// new Date("2021-10-06").toLocaleDateString("ko", {month: "long", day: "numeric"})
-// -> '10월 6일'
-
-// new Date("2021-10-06").toLocaleDateString("ko", {month: "long", day: "numeric", year: "numeric"})
-// -> '2021년 10월 6일'
-
-
 
 export default Movies;
