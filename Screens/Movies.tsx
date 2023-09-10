@@ -139,61 +139,67 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
         <ActivityIndicator />
     </Loader> 
     :
-    <Container
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh}/>}
-    >
-        <Swiper
-            horizontal
-            showsButtons={false}
-            autoplay
-            autoplayTimeout={3.5}
-            showsPagination={false}
-            loop
-            containerStyle={{width: "100%", height: SCREEN_HEIGHT/4, marginBottom: 30}}
-        >
-            {nowPlaying.map(movie => (
-                <Slide
-                    backdropPath={movie.backdrop_path}
-                    voteAverage={movie.vote_average}
-                    posterPath={movie.poster_path}
-                    originalTitle={movie.original_title}
-                    overview={movie.overview}
-                    key={movie.id} 
-                />
-            ))}
-            
-        </Swiper>
-        <ListContainer>
-            <ListTitle>Trending Movies</ListTitle>
-            <TrendingScroll 
-                data={trending}
+    <FlatList
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        data={upcoming}
+        keyExtractor={(item) => item.id + ""}
+        ItemSeparatorComponent={() => <View style={{height:20}}></View>}
+        ListHeaderComponent={() => (
+            <>
+                <Swiper
                 horizontal
-                keyExtractor={(item) => item.id + ""}
-                showsHorizontalScrollIndicator={false}
-                contentContainerStyle={{paddingHorizontal: 20}}
-                ItemSeparatorComponent={() => <View style={{width:20}}></View>}
-                renderItem={({item}) => <VMedia 
-                    // key={movie.id}
-                    posterPath={item.poster_path} // Key Extracter : 각 리스트 아이템에 어떤 key를 가져야 할 지 알려준다.
-                    originalTitle={item.original_title}
-                    voteAverage={item.vote_average}
-                />}
+                showsButtons={false}
+                autoplay
+                autoplayTimeout={3.5}
+                showsPagination={false}
+                loop
+                containerStyle={{width: "100%", height: SCREEN_HEIGHT/4, marginBottom: 30}}
+            >
+                {nowPlaying.map(movie => (
+                    <Slide
+                        backdropPath={movie.backdrop_path}
+                        voteAverage={movie.vote_average}
+                        posterPath={movie.poster_path}
+                        originalTitle={movie.original_title}
+                        overview={movie.overview}
+                        key={movie.id} 
+                    />
+                ))}
                 
+            </Swiper>
+            <ListContainer>
+                <ListTitle>Trending Movies</ListTitle>
+                <TrendingScroll 
+                    data={trending}
+                    horizontal
+                    keyExtractor={(item) => item.id + ""}
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={{paddingHorizontal: 20}}
+                    ItemSeparatorComponent={() => <View style={{width:20}}></View>}
+                    renderItem={({item}) => <VMedia 
+                        // key={movie.id}
+                        posterPath={item.poster_path} // Key Extracter : 각 리스트 아이템에 어떤 key를 가져야 할 지 알려준다.
+                        originalTitle={item.original_title}
+                        voteAverage={item.vote_average}
+                    />}
+                    
+                />
+            </ListContainer>
+            
+            <ComingsoonTitle>Comming Soon</ComingsoonTitle>
+        </>
+        )}
+        renderItem={({item}) => (
+            <HMedia
+                posterPath={item.poster_path}
+                originalTitle={item.original_title}
+                voteAverage={item.vote_average}
+                overview={item.overview}
+                releaseDate={item.release_date}
             />
-        </ListContainer>
-        
-        <ComingsoonTitle>Comming Soon</ComingsoonTitle>
-        {upcoming.map(movie => (
-            <HMedia 
-                key={movie.id}
-                posterPath={movie.poster_path}
-                originalTitle={movie.original_title}
-                voteAverage={movie.vote_average}
-                overview={movie.overview}
-                releaseDate={movie.release_date}
-            />
-        ))}
-    </Container>
+        )}
+    />  
     );
 }
 
