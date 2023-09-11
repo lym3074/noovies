@@ -8,7 +8,7 @@ import Slide from "../components/Slide";
 import VMedia from "../components/VMedia";
 import HMedia from "../components/HMedia";
 import { useQuery, QueryClient, useQueryClient } from "react-query";
-import { moviesAPI } from "../api";
+import {  MovieResponse, moviesAPI } from "../api";
 
 const Loader = styled.View`
     flex: 1;
@@ -76,7 +76,7 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
         data: nowPlayingData,
         // refetch: refetchNowPlaying,
         isRefetching : isRefetchingNowPlaying
-    } = useQuery(
+    } = useQuery<MovieResponse>(
         ["movies","nowPlaying"], // caching을 위한 키, 동일 pathing을 막아준다. rn query 캐시로 넘어가서 다른 컴포넌트에 가더라도 동일한 key의 쿼리를 사용할 수 있다.
          moviesAPI.nowPlaying
     )
@@ -85,7 +85,7 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
          data: trendingData,
         //   refetch: refetchTrending,
           isRefetching : isRefetchingTrending
-    } = useQuery(
+    } = useQuery<MovieResponse>(
         ["movies","trending"],
         moviesAPI.trending
     );
@@ -95,7 +95,7 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
         data: upcomingData,
         // refetch: refetchUpcoming,
         isRefetching : isRefetchingUpcoming
-    } = useQuery(
+    } = useQuery<MovieResponse>(
         ["movies","upcoming"],
         moviesAPI.upcoming
     )
@@ -108,6 +108,8 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
         // refetchTrending()
         // refetchUpcoming()
         qeuryClient.refetchQueries(["movies"]);
+        console.log(Object.keys(nowPlayingData?.results[0]))
+        console.log(Object.values(nowPlayingData?.results[0]).map(v => typeof v))
     }
 
     return (loading ? 
@@ -115,7 +117,7 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
         <ActivityIndicator />
     </Loader> 
     :
-    <FlatList
+    upcomingData && <FlatList
         refreshing={refreshing}
         onRefresh={onRefresh}
         data={upcomingData.results}
@@ -132,11 +134,11 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
                 loop
                 containerStyle={{width: "100%", height: SCREEN_HEIGHT/4, marginBottom: 30}}
             >
-                {nowPlayingData.results.map(movie => (
+                {nowPlayingData?.results.map(movie => (
                     <Slide
-                        backdropPath={movie.backdrop_path}
+                        backdropPath={movie.backdrop_path || ""}
+                        posterPath={movie.poster_path || ""}
                         voteAverage={movie.vote_average}
-                        posterPath={movie.poster_path}
                         originalTitle={movie.original_title}
                         overview={movie.overview}
                         key={movie.id} 
@@ -146,24 +148,23 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
             </Swiper>
             <ListContainer>
                 <ListTitle>Trending Movies</ListTitle>
-                <TrendingScroll 
+                {trendingData && <TrendingScroll 
                     data={trendingData.results}
                     horizontal
-                    keyExtractor={movieKeyExtractor}
+                    keyExtractor={(movieKeyExtractor)}
                     showsHorizontalScrollIndicator={false}
                     contentContainerStyle={{paddingHorizontal: 20}}
                     ItemSeparatorComponent={HSeparator}
                     renderItem={renderVMedia}
                     
-                />
+                />}
             </ListContainer>
             
             <ComingsoonTitle>Comming Soon</ComingsoonTitle>
         </>
         )}
         renderItem={renderHMedia}
-    />  
-    );
+    />);
 }
 
 export default Movies;
