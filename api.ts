@@ -10,6 +10,7 @@ const upcoming = () => (
     fetch(`${BASE_URL}/movie/upcoming?language=en-US&page=1&api_key=${API_KEY}`)
     .then(res => res.json())
 )
+
 const nowPlaying = () => (
     fetch(`${BASE_URL}/movie/now_playing?language=en-US&page=1&api_key=${API_KEY}`)
     .then(res => res.json())

@@ -7,7 +7,7 @@ import Swiper from "react-native-swiper";
 import Slide from "../components/Slide";
 import VMedia from "../components/VMedia";
 import HMedia from "../components/HMedia";
-import { useQuery } from "react-query";
+import { useQuery, QueryClient, useQueryClient } from "react-query";
 import { moviesAPI } from "../api";
 
 const Loader = styled.View`
@@ -69,19 +69,45 @@ const movieKeyExtractor = (item) => item.id + "";
 
 
 const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
-    const [refreshing, setRefreshing] =useState(false);
+    const qeuryClient = useQueryClient();
 
-    const {isLoading: nowPlayingLoading, data: nowPlayingData} = useQuery(
-        "nowPlaying",
-        // caching을 위한 키, 동일 pathing을 막아준다. rn query 캐시로 넘어가서 다른 컴포넌트에 가더라도 동일한 key의 쿼리를 사용할 수 있다.
+    const {
+        isLoading: nowPlayingLoading,
+        data: nowPlayingData,
+        // refetch: refetchNowPlaying,
+        isRefetching : isRefetchingNowPlaying
+    } = useQuery(
+        ["movies","nowPlaying"], // caching을 위한 키, 동일 pathing을 막아준다. rn query 캐시로 넘어가서 다른 컴포넌트에 가더라도 동일한 key의 쿼리를 사용할 수 있다.
          moviesAPI.nowPlaying
     )
-    const {isLoading: trendingLoading, data: trendingData} = useQuery("trending", moviesAPI.trending)
-    const {isLoading: upcomingLoading, data: upcomingData} = useQuery("upcoming", moviesAPI.upcoming)
+    const {
+        isLoading: trendingLoading,
+         data: trendingData,
+        //   refetch: refetchTrending,
+          isRefetching : isRefetchingTrending
+    } = useQuery(
+        ["movies","trending"],
+        moviesAPI.trending
+    );
+    
+    const {
+        isLoading: upcomingLoading,
+        data: upcomingData,
+        // refetch: refetchUpcoming,
+        isRefetching : isRefetchingUpcoming
+    } = useQuery(
+        ["movies","upcoming"],
+        moviesAPI.upcoming
+    )
     
     const loading = nowPlayingLoading || trendingLoading || upcomingLoading;
-
+    const refreshing = isRefetchingNowPlaying || isRefetchingTrending || isRefetchingUpcoming;
+    
     const onRefresh = async() => {
+        // refetchNowPlaying()
+        // refetchTrending()
+        // refetchUpcoming()
+        qeuryClient.refetchQueries(["movies"]);
     }
 
     return (loading ? 
