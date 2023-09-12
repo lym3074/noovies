@@ -10,6 +10,7 @@ import HMedia from "../components/HMedia";
 import { useQuery, QueryClient, useQueryClient } from "react-query";
 import {  MovieResponse, moviesAPI } from "../api";
 import Loader from "../components/Loader";
+import HList from "../components/HList";
 
 // const Loader = styled.View`
 //     flex: 1;
@@ -144,19 +145,7 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
                 ))}
                 
             </Swiper>
-            <ListContainer>
-                <ListTitle>Trending Movies</ListTitle>
-                {trendingData && <TrendingScroll 
-                    data={trendingData.results}
-                    horizontal
-                    keyExtractor={(movieKeyExtractor)}
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{paddingHorizontal: 20}}
-                    ItemSeparatorComponent={HSeparator}
-                    renderItem={renderVMedia}
-                    
-                />}
-            </ListContainer>
+            <HList title={"Trending Movies"} data={trendingData.results}/>
             
             <ComingsoonTitle>Comming Soon</ComingsoonTitle>
         </>
