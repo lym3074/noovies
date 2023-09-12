@@ -7,8 +7,6 @@ interface BaseResponse {
     total_pages: number;
 };
 
-
-
 export interface Movie {
     adult: boolean;
     backdrop_path: string | null;
@@ -30,19 +28,32 @@ export interface MovieResponse extends BaseResponse {
     results: Movie[]
 }
 
-const trending = () => (
-    fetch(`${BASE_URL}/movie/popular?language=en-US&page=1&api_key=${API_KEY}`)
-    .then(res => res.json())
-)
-    
-const upcoming = () => (
-    fetch(`${BASE_URL}/movie/upcoming?language=en-US&page=1&api_key=${API_KEY}`)
-    .then(res => res.json())
-)
+export const moviesAPI = {
+    trending: () => (
+        fetch(`${BASE_URL}/movie/popular?language=en-US&page=1&api_key=${API_KEY}`)
+        .then(res => res.json())
+    ),
+    upcoming: () => (
+        fetch(`${BASE_URL}/movie/upcoming?language=en-US&page=1&api_key=${API_KEY}`)
+        .then(res => res.json())
+    ),
+    nowPlaying: () => (
+        fetch(`${BASE_URL}/movie/now_playing?language=en-US&page=1&api_key=${API_KEY}`)
+        .then(res => res.json())
+    )
+}
 
-const nowPlaying = () => (
-    fetch(`${BASE_URL}/movie/now_playing?language=en-US&page=1&api_key=${API_KEY}`)
-    .then(res => res.json())
-)
-
-export const moviesAPI = {trending, upcoming, nowPlaying}
+export const tvAPI = {
+    trending: () => (
+        fetch(`${BASE_URL}/tv/popular?api_key=${API_KEY}`)
+        .then(res => res.json())
+    ),
+    airingToday: () => (
+        fetch(`${BASE_URL}/tv/airing_today?api_key=${API_KEY}`)
+        .then(res => res.json())
+    ),
+    topRated: () => (
+        fetch(`${BASE_URL}/tv/top_rated?api_key=${API_KEY}`)
+        .then(res => res.json())
+    )
+}
