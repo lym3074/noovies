@@ -1,9 +1,10 @@
 import { BlurView } from "expo-blur";
 import React from "react";
-import { View, StyleSheet, useColorScheme } from "react-native";
+import { View, StyleSheet, useColorScheme, TouchableOpacity, TouchableWithoutFeedback } from "react-native";
 import styled from "styled-components/native/";
 import { makeImgPath } from "../utils";
 import Poster from "./Poster";
+import { useNavigation } from "@react-navigation/native";
 
 
 const Title = styled.Text`
@@ -51,23 +52,30 @@ const Slide: React.FC<SlideProps> = ({
     overview
 }) => {
     const isDark = useColorScheme() === "dark"? true: false;
+    const navigation = useNavigation();
+    const goToDetail = () => {
+        navigation.navigate("Stack", { screen: "Detail"})
+    }
     return (
-    <View style={{flex: 1}}>
-        <BgImg 
-            style={StyleSheet.absoluteFill}
-            source={{uri: makeImgPath(backdropPath)}} />
-        <BlurView style={StyleSheet.absoluteFill} intensity={90} tint={isDark?"dark":"light"} >
-            <Wrapper>
-                <Poster path={posterPath}/>
-                <Column>
-                    <Title>{originalTitle}</Title>
-                    {voteAverage > 0 &&<Votes>⭐️{voteAverage}/10</Votes>}
-                    <OverView>{overview.slice(0, 90)}...</OverView>
-                    
-                </Column>
-            </Wrapper>
-        </BlurView>
-    </View>)
+        <TouchableWithoutFeedback onPress={goToDetail}>
+            <View style={{flex: 1}}>
+                <BgImg 
+                    style={StyleSheet.absoluteFill}
+                    source={{uri: makeImgPath(backdropPath)}} />
+                <BlurView style={StyleSheet.absoluteFill} intensity={90} tint={isDark?"dark":"light"} >
+                    <Wrapper>
+                        <Poster path={posterPath}/>
+                        <Column>
+                            <Title>{originalTitle}</Title>
+                            {voteAverage > 0 &&<Votes>⭐️{voteAverage}/10</Votes>}
+                            <OverView>{overview.slice(0, 90)}...</OverView>
+                            
+                        </Column>
+                    </Wrapper>
+                </BlurView>
+            </View>
+        </TouchableWithoutFeedback>
+    )
 };
 
 export default Slide
