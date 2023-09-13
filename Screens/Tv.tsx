@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, ScrollView, FlatList, RefreshControl } from "react-native";
 import { useQuery, useQueryClient,  } from "react-query";
 import { tvAPI } from "../api";
@@ -8,17 +8,20 @@ import HList, { HListSeparator } from "../components/HList";
 
 const Tv = () => {
     const qeuryClient = useQueryClient();
+    const [refreshing, setRefreshing] = useState(false);
 
-    const {isLoading: todayLoading, data: todayData, isRefetching: todayRefetching } = useQuery(["tv", "today"], tvAPI.airingToday);
-    const {isLoading: topLoading, data: topData, isRefetching: topRefetching } = useQuery(["tv", "top"], tvAPI.topRated);
-    const {isLoading: trendingLoading, data: trendingData, isRefetching: trendingRefetching } = useQuery(["tv", "trending"], tvAPI.trending);
+    const {isLoading: todayLoading, data: todayData } = useQuery(["tv", "today"], tvAPI.airingToday);
+    const {isLoading: topLoading, data: topData } = useQuery(["tv", "top"], tvAPI.topRated);
+    const {isLoading: trendingLoading, data: trendingData } = useQuery(["tv", "trending"], tvAPI.trending);
 
     const loading = todayLoading || topLoading || trendingLoading;
     
-    const refreshing = todayRefetching || topRefetching || trendingRefetching;
+    // const refreshing = todayRefetching || topRefetching || trendingRefetching;
 
-    const onRefresh = () => {
-        qeuryClient.refetchQueries(["tv"]);
+    const onRefresh = async() => {
+        setRefreshing(true);
+        await qeuryClient.refetchQueries(["tv"]);
+        setRefreshing(false)
     }
 
     if (loading ) {

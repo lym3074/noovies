@@ -71,12 +71,11 @@ const movieKeyExtractor = (item) => item.id + "";
 
 const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
     const qeuryClient = useQueryClient();
+    const [refreshing, setRefreshing] = useState(false);
 
     const {
         isLoading: nowPlayingLoading,
         data: nowPlayingData,
-        // refetch: refetchNowPlaying,
-        isRefetching : isRefetchingNowPlaying
     } = useQuery<MovieResponse>(
         ["movies","nowPlaying"], // caching을 위한 키, 동일 pathing을 막아준다. rn query 캐시로 넘어가서 다른 컴포넌트에 가더라도 동일한 key의 쿼리를 사용할 수 있다.
          moviesAPI.nowPlaying
@@ -84,8 +83,7 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
     const {
         isLoading: trendingLoading,
          data: trendingData,
-        //   refetch: refetchTrending,
-          isRefetching : isRefetchingTrending
+
     } = useQuery<MovieResponse>(
         ["movies","trending"],
         moviesAPI.trending
@@ -94,23 +92,23 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
     const {
         isLoading: upcomingLoading,
         data: upcomingData,
-        // refetch: refetchUpcoming,
-        isRefetching : isRefetchingUpcoming
     } = useQuery<MovieResponse>(
         ["movies","upcoming"],
         moviesAPI.upcoming
     )
     
     const loading = nowPlayingLoading || trendingLoading || upcomingLoading;
-    const refreshing = isRefetchingNowPlaying || isRefetchingTrending || isRefetchingUpcoming;
+    // const refreshing = isRefetchingNowPlaying || isRefetchingTrending || isRefetchingUpcoming;
     
     const onRefresh = async() => {
-        // refetchNowPlaying()
-        // refetchTrending()
-        // refetchUpcoming()
-        qeuryClient.refetchQueries(["movies"]);
-        console.log(Object.keys(nowPlayingData?.results[0]))
-        console.log(Object.values(nowPlayingData?.results[0]).map(v => typeof v))
+        setRefreshing(true);
+
+        await qeuryClient.refetchQueries(["movies"]);
+        
+        setRefreshing(false);
+
+        // console.log(Object.keys(nowPlayingData?.results[0]))
+        // console.log(Object.values(nowPlayingData?.results[0]).map(v => typeof v))
     }
 
     return (loading ? 
