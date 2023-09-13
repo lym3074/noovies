@@ -144,7 +144,6 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
                 
             </Swiper>
             <HList title={"Trending Movies"} data={trendingData.results}/>
-            
             <ComingsoonTitle>Comming Soon</ComingsoonTitle>
         </>
         )}
