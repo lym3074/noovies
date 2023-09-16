@@ -21,6 +21,9 @@ const Tv = () => {
     const onRefresh = async() => {
         setRefreshing(true);
         await qeuryClient.refetchQueries(["tv"]);
+
+        console.log(Object.keys(todayData?.results[0]))
+        console.log(Object.values(todayData?.results[0]).map(v => typeof v))
         setRefreshing(false)
     }
 

@@ -64,6 +64,7 @@ const renderHMedia = ({item}) => (
         voteAverage={item.vote_average}
         overview={item.overview}
         releaseDate={item.release_date}
+        fullData={item}
     />
 )
 
@@ -138,7 +139,8 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
                         voteAverage={movie.vote_average}
                         originalTitle={movie.original_title}
                         overview={movie.overview}
-                        key={movie.id} 
+                        key={movie.id}
+                        fullData={movie}
                     />
                 ))}
                 

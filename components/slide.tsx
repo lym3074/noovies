@@ -5,6 +5,7 @@ import styled from "styled-components/native/";
 import { makeImgPath } from "../utils";
 import Poster from "./Poster";
 import { useNavigation } from "@react-navigation/native";
+import { Movie, TV } from "../api";
 
 
 const Title = styled.Text`
@@ -42,6 +43,7 @@ interface SlideProps {
     posterPath: string;
     originalTitle: string;
     overview: string;
+    fullData: Movie | TV;
 }
 
 const Slide: React.FC<SlideProps> = ({
@@ -49,7 +51,8 @@ const Slide: React.FC<SlideProps> = ({
     voteAverage,
     posterPath,
     originalTitle,
-    overview
+    overview,
+    fullData
 }) => {
     const isDark = useColorScheme() === "dark"? true: false;
     const navigation = useNavigation();
@@ -57,7 +60,7 @@ const Slide: React.FC<SlideProps> = ({
         navigation.navigate("Stack", {
             screen: "Detail",
             params: {
-              originalTitle
+              ...fullData
           }})
     }
     return (
