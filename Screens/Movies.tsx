@@ -12,13 +12,6 @@ import {  MovieResponse, moviesAPI } from "../api";
 import Loader from "../components/Loader";
 import HList from "../components/HList";
 
-// const Loader = styled.View`
-//     flex: 1;
-//     justify-content: center;
-//     align-items: center;
-// `;
-
-const API_KEY = 'ef0d1a8e7f2e44edcc57e73fdd30ad39';
 const {height: SCREEN_HEIGHT} = Dimensions.get("screen");
 
 const ListTitle = styled.Text`
