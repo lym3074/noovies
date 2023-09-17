@@ -22,6 +22,7 @@ export interface Movie {
     video: boolean;
     vote_average: number;
     vote_count: number;
+    videos: object;
 }
 
 export interface MovieResponse extends BaseResponse {
@@ -29,19 +30,20 @@ export interface MovieResponse extends BaseResponse {
 };
 
 export interface TV {
-    backdrop_path:string
-    first_air_date: string
-    genre_ids: object
-    id: number
-    name: string
-    origin_country: object
-    original_language: string
-    original_name: string
-    overview: string
-    popularity: number
-    poster_path: string
-    vote_average: number
-    vote_count: number
+    backdrop_path:string;
+    first_air_date: string;
+    genre_ids: object;
+    id: number;
+    name: string;
+    origin_country: object;
+    original_language: string;
+    original_name: string;
+    overview: string;
+    popularity: number;
+    poster_path: string;
+    vote_average: number;
+    vote_count: number;
+    videos: object;
 }
 
 export interface TVResponse extends BaseResponse {

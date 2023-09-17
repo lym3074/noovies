@@ -1,13 +1,16 @@
 import React, { useEffect } from "react";
 import { styled } from "styled-components/native";
-import { Dimensions, StyleSheet, Text } from "react-native";
+import { Dimensions, StyleSheet, Linking } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Movie, TV, moviesAPI, tvAPI } from "../api";
+import { Movie, MovieResponse, TV, TVResponse, moviesAPI, tvAPI } from "../api";
 import Poster from "../components/Poster";
 import { makeImgPath } from "../utils";
 import { LinearGradient } from 'expo-linear-gradient';
 import colors from "../const";
 import { useQuery } from "react-query";
+import Loader from "../components/Loader";
+import {Ionicons} from "@expo/vector-icons"
+import * as WebBrowser from 'expo-web-browser';
 
 const {height: SCREEN_HEIGHT} = Dimensions.get("screen");
 
@@ -21,9 +24,7 @@ const Header = styled.View`
     padding: 0px 20px;
 `;
 
-const Background = styled.Image`
-
-`;
+const Background = styled.Image``;
 
 const Column = styled.View`
     flex-direction : row;
@@ -40,9 +41,25 @@ const Title = styled.Text`
 
 const OverView = styled.Text`
     color: ${(prop)=> prop.theme.textColor};
-    margin-top: 20px;
+    margin: 20px 0px;
+`;
+
+const Data = styled.View`
     padding: 0px 20px;
 `;
+
+const VideoButton = styled.TouchableOpacity`
+    flex-direction: row;
+    width : 90%;
+`;
+const ButtonText = styled.Text`
+    font-weight: 600;
+    color: white;
+    margin-bottom: 10px;
+    line-height: 24px;
+    margin-left: 10px;
+`
+
 type RootStackParamList = {
     Detail: Movie | TV
 };
@@ -54,24 +71,30 @@ const Detail: React.FC<DetailScreenProps> = ({
     route : {params}
 }) => {
 
-    const {isLoading: moviesLoading, data: moviesData} = useQuery(["Movies", params.id], moviesAPI.detail,
-    {
-        enabled: "original_title" in params
-    });
-    
-    const {isLoading: tvLoading, data: tvData} = useQuery(["Tv", params.id], tvAPI.detail,
-    {
-        enabled: "original_name" in params
-    });
+    const isMovie = "original_title" in params ? true : false;
 
-    console.log("movie", moviesData);
+    const {isLoading, data} = useQuery<MovieResponse | TVResponse>([
+        isMovie?"Movies": "TV", 
+        params.id
+    ], isMovie? moviesAPI.detail:tvAPI.detail);
+
     useEffect(() => {
         setOptions({
-            title: "original_title" in params
+            title: isMovie
             ? "Movie"
             : "Tv Show"
         })
-    },[])
+    },[]);
+
+    const openYTLink = async (videoKey: string) => {
+        const baseUrl = `https://m.youtube.com/watch?v=${videoKey}`;
+
+        // await Linking.openURL(baseUrl);
+        // canOpenURL도 있다.
+        // setting - ex) location을 허용하지 않은 유저에게 허용해달라고 설정을 열어준다.
+
+        await WebBrowser.openBrowserAsync(baseUrl);
+    }
 
     return (
         <Container>
@@ -94,7 +117,20 @@ const Detail: React.FC<DetailScreenProps> = ({
                     </Title>
                 </Column>
             </Header>
-            <OverView>{params.overview}</OverView>
+            <Data>
+                <OverView>{params.overview}</OverView>
+                {isLoading? <Loader />: null}
+                {data?.videos?.results?.map(video => (
+                    <VideoButton
+                        key={video.key}
+                        onPress={() => openYTLink(video.key)}
+                    >
+                        <Ionicons name="logo-youtube" color={"red"} size={24} />
+                        <ButtonText numberOfLines={1}>{video.name}</ButtonText>
+                    </VideoButton>
+                ))}
+            </Data>
+            
         </Container>
     )
 }
