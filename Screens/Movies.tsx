@@ -85,9 +85,21 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
     const {
         isLoading: upcomingLoading,
         data: upcomingData,
+        hasNextPage,
+        fetchNextPage
     } = useInfiniteQuery<MovieResponse>(
         ["movies","upcoming"],
-        moviesAPI.upcoming
+        moviesAPI.upcoming,
+        {
+            getNextPageParam : (currentPage) => {
+                const nextPage = currentPage.page + 1;
+                if(nextPage > currentPage.total_pages) {
+                    return null;
+                }
+
+                return currentPage.total_pages >= nextPage ? nextPage : null
+            }
+        }
     )
     
     const loading = nowPlayingLoading || trendingLoading || upcomingLoading;
@@ -105,8 +117,12 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
     };
 
     const loadMore = async() => {
-        await "";
+        if(hasNextPage) {
+            fetchNextPage();
+        }
     }
+
+    console.log(upcomingData)
 
     return (loading ? 
     <Loader />
@@ -114,7 +130,7 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
     upcomingData && <FlatList
         refreshing={refreshing}
         onEndReached={loadMore}
-        onEndReachedThreshold={0.4} // 실행시키는 목록의 하단에서 내용 끝까지의 거리
+        // onEndReachedThreshold={0.4} // 실행시키는 목록의 하단에서 내용 끝까지의 거리
         onRefresh={onRefresh}
         data={upcomingData.pages.map(page => page.results).flat()}
         keyExtractor={movieKeyExtractor}
