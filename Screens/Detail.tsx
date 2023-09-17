@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { styled } from "styled-components/native";
-import { Dimensions, StyleSheet, Linking } from "react-native";
+import { Dimensions, StyleSheet, Linking, Share, Platform } from "react-native";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { Movie, MovieResponse, TV, TVResponse, moviesAPI, tvAPI } from "../api";
 import Poster from "../components/Poster";
@@ -52,13 +52,16 @@ const VideoButton = styled.TouchableOpacity`
     flex-direction: row;
     width : 90%;
 `;
+
 const ButtonText = styled.Text`
     font-weight: 600;
     color: white;
     margin-bottom: 10px;
     line-height: 24px;
     margin-left: 10px;
-`
+`;
+
+const ShareButton = styled.TouchableOpacity``;
 
 type RootStackParamList = {
     Detail: Movie | TV
@@ -70,21 +73,50 @@ const Detail: React.FC<DetailScreenProps> = ({
     navigation:{ setOptions },
     route : {params}
 }) => {
-
+    const isAndroid = Platform.OS === "android" ? true: false;
     const isMovie = "original_title" in params ? true : false;
 
-    const {isLoading, data} = useQuery<MovieResponse | TVResponse>([
+    // 타입 에러가 나면 useQuery<MovieResponse | TVResponse>로 변경
+    const {isLoading, data} = useQuery([
         isMovie?"Movies": "TV", 
         params.id
     ], isMovie? moviesAPI.detail:tvAPI.detail);
 
+    
+
+    const shareMidea = async() => {
+        const homepage = isMovie
+            ? `https://www.imdb.com/title/${data.imdb_id}/`
+            : data.homepage;
+
+        const optionalShareObj = isAndroid
+            ? { message: `${params.overview} go go! => ${homepage}`}
+            : { url: homepage }
+
+        await Share.share({
+            ...optionalShareObj,
+            title: "original_title" in params
+                ? params.original_title
+                : params.original_name,
+        });
+        // data가 도달하기 전에 headerRight가 렌더되어 처음엔 동작하지 않음
+    }
+
     useEffect(() => {
         setOptions({
-            title: isMovie
-            ? "Movie"
-            : "Tv Show"
+            title: isMovie? "Movie" : "Tv Show"
         })
     },[]);
+
+    useEffect(() => {
+        data && setOptions({
+            headerRight: () => (
+                <ShareButton onPress={shareMidea}>
+                    <Ionicons name="share-outline" color={"white"} size={24} />
+                </ShareButton>
+            )
+        })
+    },[data]);
 
     const openYTLink = async (videoKey: string) => {
         const baseUrl = `https://m.youtube.com/watch?v=${videoKey}`;
