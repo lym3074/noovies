@@ -7,7 +7,7 @@ import Swiper from "react-native-swiper";
 import Slide from "../components/Slide";
 import VMedia from "../components/VMedia";
 import HMedia from "../components/HMedia";
-import { useQuery, QueryClient, useQueryClient } from "react-query";
+import { useQuery, QueryClient, useQueryClient, useInfiniteQuery } from "react-query";
 import {  MovieResponse, moviesAPI } from "../api";
 import Loader from "../components/Loader";
 import HList from "../components/HList";
@@ -77,7 +77,6 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
     const {
         isLoading: trendingLoading,
          data: trendingData,
-
     } = useQuery<MovieResponse>(
         ["movies","trending"],
         moviesAPI.trending
@@ -86,7 +85,7 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
     const {
         isLoading: upcomingLoading,
         data: upcomingData,
-    } = useQuery<MovieResponse>(
+    } = useInfiniteQuery<MovieResponse>(
         ["movies","upcoming"],
         moviesAPI.upcoming
     )
@@ -103,6 +102,10 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
 
         // console.log(Object.keys(nowPlayingData?.results[0]))
         // console.log(Object.values(nowPlayingData?.results[0]).map(v => typeof v))
+    };
+
+    const loadMore = async() => {
+        await "";
     }
 
     return (loading ? 
@@ -110,8 +113,10 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
     :
     upcomingData && <FlatList
         refreshing={refreshing}
+        onEndReached={loadMore}
+        onEndReachedThreshold={0.4} // 실행시키는 목록의 하단에서 내용 끝까지의 거리
         onRefresh={onRefresh}
-        data={upcomingData.results}
+        data={upcomingData.pages.map(page => page.results).flat()}
         keyExtractor={movieKeyExtractor}
         ItemSeparatorComponent={VSeparator}
         ListHeaderComponent={() => (
@@ -147,3 +152,13 @@ const Movies: React.FC<NativeStackScreenProps<any, 'Movies'>> = () => {
 }
 
 export default Movies;
+
+/*{
+"pageParams": [undefined],
+"pages": [
+  {"dates": [Object], "page": 1, "results": [Array], "total_pages": 18, "total_results": 348}
+  {"dates": [Object], "page": 2, "results": [Array], "total_pages": 18, "total_results": 348}
+  {"dates": [Object], "page": 3, "results": [Array], "total_pages": 18, "total_results": 348}
+  {"dates": [Object], "page": 4, "results": [Array], "total_pages": 18, "total_results": 348}
+  ]
+}*/
